@@ -1,0 +1,46 @@
+name: VM6 ControlChar Org Identity 0916
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  upload:
+    name: vm6-controlchar-org-job-${{ matrix.n }}
+    strategy:
+      fail-fast: false
+      matrix:
+        n: [1, 2, 3, 4, 5]
+    runs-on: ubuntu-latest
+    env:
+      MERGIFY_TOKEN: ${{ secrets.VM6_MERGIFY_TOKEN_CONTROLCHAR_ORG_0916 }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install pinned current Mergify CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/Mergifyio/mergify-cli/main/install.sh | MERGIFY_VERSION=2026.9.16.1 sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Upload control-character JUnit identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > vm6-controlchar.xml <<'XML'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <testsuite name="vm6-control" tests="4" failures="4">
+            <testcase classname="vm6.ctrl" name="VM6_CTRL_NEWLINE_A&#10;B"><failure message="nl">nl</failure></testcase>
+            <testcase classname="vm6.ctrl" name="VM6_CTRL_NEWLINE_A B"><failure message="space">space</failure></testcase>
+            <testcase classname="vm6.ctrl" name="VM6_CTRL_TAB_A&#9;B"><failure message="tab">tab</failure></testcase>
+            <testcase classname="vm6.ctrl" name="VM6_CTRL_TAB_A B"><failure message="space2">space2</failure></testcase>
+          </testsuite>
+          XML
+          set +e
+          mergify ci junit-process vm6-controlchar.xml \
+            --repository m6d911z2/vm6-low-risk-guard-20260913 \
+            --test-framework junit --test-language generic --test-exit-code 1 -v
+          rc=$?
+          set -e
+          echo "VM6_JUNIT_PROCESS_EXIT=$rc matrix=${{ matrix.n }}"
+          exit 0
