@@ -36,5 +36,3 @@ merge_protections:
 merge_protections_settings:
   reporting_method: check-runs
   post_comment: true
-  auto_merge_conditions:
-    - label = vm6-never-auto-merge
