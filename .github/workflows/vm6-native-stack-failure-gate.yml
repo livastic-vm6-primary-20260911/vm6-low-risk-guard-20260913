@@ -1,0 +1,27 @@
+name: VM6 Native Stack Failure Gate 0917
+on:
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  gate:
+    name: vm6-native-stack-failure-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail only the speculative batch representing parent PR 23
+        shell: python
+        run: |
+          import json, os, sys
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
+              event = json.load(f)
+          pr = event.get("pull_request") or {}
+          text = f"{pr.get('title') or ''}\n{pr.get('body') or ''}"
+          has_parent = "#23" in text or "/pull/23" in text
+          has_child = "#24" in text or "/pull/24" in text
+          print(f"VM6_NATIVE_GATE parent={has_parent} child={has_child} number={pr.get('number')}")
+          if has_parent and not has_child:
+              print("VM6_NATIVE_PARENT_ONLY_FAIL")
+              sys.exit(1)
+          print("VM6_NATIVE_CHILD_OR_CONTROL_PASS")
