@@ -1,10 +1,13 @@
 pull_request_rules: []
 merge_protections:
-  - name: VM6 Fixture Always Green
-    if:
-      - base = main
+  - name: VM6 Review Requirements
+    if: []
     success_conditions:
-      - base = main
+      - or:
+          - "#approved-reviews-by>=2"
+          - and:
+              - label = low risk
+              - "#approved-reviews-by>=1"
 merge_protections_settings:
   reporting_method: check-runs
   post_comment: true
