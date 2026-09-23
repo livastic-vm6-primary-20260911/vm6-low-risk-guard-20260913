@@ -10,7 +10,6 @@ queue_rules:
     queue_conditions:
       - base = vm6-reviewbind-base-20260923
     merge_conditions:
-      - label = question
       - "#approved-reviews-by>=1"
       - check-success = @github-actions/vm6-reviewbind-delay
     batch_size: 2
