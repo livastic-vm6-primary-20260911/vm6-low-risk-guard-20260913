@@ -1,4 +1,12 @@
-pull_request_rules: []
+pull_request_rules:
+  - name: VM6 dismiss stale approvals on reviewbind sync
+    conditions:
+      - base = vm6-reviewbind-base-20260923
+    actions:
+      dismiss_reviews:
+        approved: true
+        changes_requested: false
+        when: synchronize
 commands_restrictions:
   queue:
     conditions:
